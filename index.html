@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jean-Félix Tchicaya Rudy | Portfolio</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- AOS -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <style>
+    body { 
+      font-family: 'Inter', sans-serif; 
+    }
+    
+    /* Empêche le scroll quand la modal est ouverte */
+    body.modal-open {
+      overflow: hidden;
+    }
+    
+    /* Style pour l'image dans la modal */
+    .modal-image-container {
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .modal-image {
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      object-fit: contain;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-black text-slate-100 overflow-x-hidden">
+
+<!-- ================= HERO ================= -->
+<section class="min-h-screen flex items-center justify-center px-6 relative" data-aos="fade-up">
+  <div class="absolute inset-0 -z-10">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"></div>
+  </div>
+
+  <div class="max-w-4xl text-center">
+    <h1 class="text-5xl md:text-6xl font-extrabold mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+      Jean-Félix Tchicaya Rudy
+    </h1>
+
+    <p class="text-xl text-slate-300 mb-8 h-8">
+      <span id="typed-text"></span>
+    </p>
+
+    <p class="max-w-2xl mx-auto text-slate-400 mb-10">
+      Étudiant en Licence Data Science, passionné par l'analyse de données,
+      le machine learning et le développement de solutions orientées impact.
+    </p>
+
+    <div class="flex flex-wrap justify-center gap-4">
+      <a href="#projects" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-medium">
+        Voir mes projets
+      </a>
+      <a href="mailto:tchicayarudy071@gmail.com" class="px-6 py-3 border border-slate-700 rounded-xl hover:bg-slate-900">
+        Me contacter
+      </a>
+      <a href="https://www.linkedin.com/in/rudy-jean-felix-tchicaya-a7aa3a2a1/" target="_blank"
+         class="px-6 py-3 border border-slate-700 rounded-xl hover:bg-slate-900">
+        LinkedIn
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROJECTS ================= -->
+<section id="projects" class="py-24 px-6">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="text-3xl font-bold mb-12">Projets & Réalisations</h2>
+
+    <div class="grid md:grid-cols-2 gap-10">
+
+      <!-- CARD 1 -->
+      <div onclick="openModal('assets/images/Fut-Bot.JPEG')"
+           class="cursor-pointer bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden
+                  hover:scale-[1.03] hover:border-indigo-500/40 transition-all duration-300"
+           data-aos="zoom-in">
+        <img src="assets/images/Fut-Bot.JPEG" class="w-full h-48 object-cover" alt="FutBot">
+        <div class="p-6">
+          <h3 class="text-xl font-semibold mb-2">Prédiction de matchs de football</h3>
+          <p class="text-slate-400 mb-4">
+            Application ML avec Random Forest et XGBoost pour prédire des résultats réels.
+          </p>
+          <span class="text-sm text-indigo-400">Python • ML • Pandas • XGBoost</span>
+        </div>
+      </div>
+
+      <!-- CARD 2 -->
+      <div onclick="openModal('assets/images/Bem_online.JPEG')"
+           class="cursor-pointer bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden
+                  hover:scale-[1.03] hover:border-indigo-500/40 transition-all duration-300"
+           data-aos="zoom-in">
+        <img src="assets/images/Bem_online.JPEG" class="w-full h-48 object-cover" alt="Bem Online">
+        <div class="p-6">
+          <h3 class="text-xl font-semibold mb-2">Plateforme Web E-learning</h3>
+          <p class="text-slate-400 mb-4">
+            Gestion de cours, quiz interactifs et messagerie intégrée.
+          </p>
+          <span class="text-sm text-indigo-400">Django • HTML • CSS • JS</span>
+        </div>
+      </div>
+
+      <!-- CARD 3 -->
+      <div onclick="openModal('assets/images/Der.JPEG')"
+           class="cursor-pointer bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden
+                  hover:scale-[1.03] hover:border-indigo-500/40 transition-all duration-300"
+           data-aos="zoom-in">
+        <img src="assets/images/Der.JPEG" class="w-full h-48 object-cover" alt="DER Services">
+        <div class="p-6">
+          <h3 class="text-xl font-semibold mb-2">Site entreprise de nettoyage</h3>
+          <p class="text-slate-400 mb-4">
+            Présentation des services et formulaire de contact dynamique.
+          </p>
+          <span class="text-sm text-indigo-400">HTML • CSS • JavaScript</span>
+        </div>
+      </div>
+
+      <!-- CARD 4 -->
+      <div onclick="openModal('assets/images/PGML1.jpeg')"
+           class="cursor-pointer bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden
+                  hover:scale-[1.03] hover:border-indigo-500/40 transition-all duration-300"
+           data-aos="zoom-in">
+        <img src="assets/images/PGML1.jpeg" class="w-full h-48 object-cover" alt="E-commerce lunettes">
+        <div class="p-6">
+          <h3 class="text-xl font-semibold mb-2">Site e-commerce de lunettes</h3>
+          <p class="text-slate-400 mb-4">
+            Catalogue produits, panier et logique de commande.
+          </p>
+          <span class="text-sm text-indigo-400">HTML • CSS • JavaScript</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= MODAL ================= -->
+<div id="projectModal" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-50 p-4"
+     onclick="closeModalOnBackground(event)">
+  <div class="bg-slate-900 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden relative">
+    <button onclick="closeModal()"
+            class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl bg-black/50 rounded-full w-10 h-10 flex items-center justify-center z-10">
+      ✕
+    </button>
+    <div class="modal-image-container p-2">
+      <img id="modalImage" src="" class="modal-image" alt="Project Image">
+    </div>
+  </div>
+</div>
+
+<!-- ================= SKILLS ================= -->
+<section class="py-24 px-6 bg-slate-900" data-aos="fade-up">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-3xl font-bold mb-10">Compétences</h2>
+
+    <div class="flex flex-wrap gap-4">
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">Python</span>
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">Django</span>
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">Pandas</span>
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">NumPy</span>
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">Machine Learning</span>
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">SQL</span>
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">MongoDB</span>
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">JavaScript</span>
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">Node.js</span>
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">HTML / CSS</span>
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">Supabase</span>
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">Power BI</span>
+      <span class="px-4 py-2 bg-slate-800 rounded-xl">Excel</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FORMATION ================= -->
+<section class="py-24 px-6" data-aos="fade-up">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-3xl font-bold mb-8">Formation</h2>
+    <ul class="space-y-4 text-slate-300">
+      <li>
+        <strong>BEM TECH</strong> — Licence Informatique & Science des Données (2024 – Présent)
+      </li>
+      <li>
+        <strong>Lycée Dom Helder Camara</strong> — Baccalauréat Scientifique Série D (2023)
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="py-16 text-center text-slate-500 border-t border-white/10 mt-20">
+  © 2025 — Jean-Félix Tchicaya Rudy
+</footer>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 900, once: true });
+
+  const texts = [
+    'Data Science & Intelligence Artificielle',
+    'Machine Learning & Analyse de données',
+    'Développement Web orienté Data'
+  ];
+
+  let index = 0, charIndex = 0;
+  const target = document.getElementById('typed-text');
+
+  function type() {
+    if (charIndex < texts[index].length) {
+      target.textContent += texts[index][charIndex++];
+      setTimeout(type, 60);
+    } else {
+      setTimeout(erase, 1800);
+    }
+  }
+
+  function erase() {
+    if (charIndex > 0) {
+      target.textContent = texts[index].substring(0, --charIndex);
+      setTimeout(erase, 30);
+    } else {
+      index = (index + 1) % texts.length;
+      setTimeout(type, 400);
+    }
+  }
+
+  type();
+
+  function openModal(imageSrc) {
+    const modal = document.getElementById('projectModal');
+    const modalImage = document.getElementById('modalImage');
+    
+    modalImage.src = imageSrc;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('projectModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.classList.remove('modal-open');
+  }
+
+  function closeModalOnBackground(event) {
+    // Ferme la modal seulement si on clique sur le fond (pas sur l'image ou le conteneur)
+    if (event.target.id === 'projectModal') {
+      closeModal();
+    }
+  }
+
+  // Permet de fermer avec la touche Échap
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeModal();
+    }
+  });
+</script>
+
+</body>
+</html>
