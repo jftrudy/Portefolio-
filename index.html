@@ -1,450 +1,411 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jean-Félix Tchicaya Rudy | Portfolio</title>
+  <title>Jean-Félix Tchicaya Rudy | Ingénieur Data & Front-end</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'], },
+          colors: { gray: tailwind.colors.zinc }
+        }
+      }
+    }
+  </script>
+
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    /* CURSEUR STRICT UNIQUEMENT SUR ORDINATEUR */
+    @media (pointer: fine) {
+      * { cursor: none !important; }
+    }
     
-    /* Styles pour la modal */
-    body.modal-open { overflow: hidden; }
-    .modal-image-container { max-height: 80vh; display: flex; align-items: center; justify-content: center; }
-    .modal-image { max-height: 80vh; width: auto; max-width: 100%; object-fit: contain; border-radius: 0.5rem; transition: opacity 0.3s ease; }
+    body { font-family: 'Inter', sans-serif; overflow-x: hidden; background-color: #000; }
+    body.drawer-open { overflow: hidden; }
     
-    /* Effet de verre */
-    .glass-effect {
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+    .bento-card {
+      background-color: #09090b;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .bento-card:hover {
+      background-color: #121214;
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
     }
 
-    /* Animation fade pour le changement d'image */
-    .fade-in { animation: fadeIn 0.3s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0.5; } to { opacity: 1; } }
+    /* Custom Cursor - Retour à 20px */
+    #cursor {
+      width: 20px; height: 20px;
+      background: white; border-radius: 50%;
+      position: fixed; pointer-events: none; z-index: 9999;
+      mix-blend-mode: difference;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s;
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      #cursor { display: none !important; }
+      * { cursor: auto !important; }
+    }
+
+    /* Padding ajouté pour éviter que le clip-path ne rogne le glow du bouton */
+    .reveal-text { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+    .reveal-btn-container { clip-path: polygon(-10% -10%, 110% -10%, 110% 110%, -10% 110%); }
+
+    .shimmer {
+      background: linear-gradient(90deg, #52525b 0%, #ffffff 50%, #52525b 100%);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: shine 4s linear infinite;
+    }
+
+    @keyframes shine { to { background-position: 200% center; } }
+
+    /* BACKGROUND DATA GRID & BEAMS */
+    .bg-grid {
+      background-size: 40px 40px;
+      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    }
     
-    /* Curseur clignotant */
-    .animate-blink { animation: blink 1s step-end infinite; }
-    @keyframes blink { 50% { opacity: 0; } }
+    .bg-grid-bright {
+      background-size: 40px 40px;
+      background-image: radial-gradient(circle, rgba(16, 185, 129, 0.4) 1px, transparent 1px);
+    }
+
+    .mouse-mask {
+      -webkit-mask-image: radial-gradient(circle 350px at var(--x, 50%) var(--y, 50%), black 0%, transparent 100%);
+      mask-image: radial-gradient(circle 350px at var(--x, 50%) var(--y, 50%), black 0%, transparent 100%);
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+      .mouse-mask { mask-image: none; -webkit-mask-image: none; opacity: 0.3; }
+    }
+
+    .data-beam {
+      position: absolute;
+      top: -200px;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), rgba(16, 185, 129, 0.8), transparent);
+      animation: meteor linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes meteor {
+      0% { transform: translateY(0); opacity: 0; }
+      10% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { transform: translateY(120vh); opacity: 0; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
   </style>
 </head>
 
-<body class="bg-slate-950 text-slate-100 overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+<body class="text-zinc-300 antialiased selection:bg-white selection:text-black relative">
 
-<div class="fixed inset-0 -z-50">
-    <div class="absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-indigo-600/20 rounded-full blur-[100px] animate-pulse"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[40rem] h-[40rem] bg-purple-600/20 rounded-full blur-[100px] animate-pulse" style="animation-delay: 2s;"></div>
-</div>
+<div id="cursor"></div>
 
-<section class="min-h-screen flex items-center justify-center px-6 relative" data-aos="fade-in">
-  <div class="max-w-4xl text-center">
+<nav class="fixed top-0 w-full z-40 px-6 py-6 flex justify-between items-center mix-blend-difference">
+    <span class="text-white font-bold tracking-tighter text-2xl">JFT.</span>
+    <div class="hidden md:flex gap-8 text-xs font-semibold uppercase tracking-widest text-zinc-400">
+        <a href="#projects" class="hover:text-white transition-colors">Projets</a>
+        <a href="#skills" class="hover:text-white transition-colors">Parcours</a>
+    </div>
+</nav>
+
+<section class="min-h-[100dvh] flex flex-col justify-center px-6 md:px-12 lg:px-24 relative z-20 pt-28 pb-24">
+  
+  <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+    <div class="absolute inset-0 bg-grid opacity-30"></div>
+    <div id="grid-mask" class="absolute inset-0 bg-grid-bright mouse-mask hidden sm:block"></div>
+
+    <div class="data-beam left-[15%]" style="height: 150px; animation-duration: 5s; animation-delay: 1s;"></div>
+    <div class="data-beam left-[35%]" style="height: 250px; animation-duration: 8s; animation-delay: 3s;"></div>
+    <div class="data-beam left-[65%]" style="height: 180px; animation-duration: 6s; animation-delay: 0.5s;"></div>
+    <div class="data-beam left-[85%]" style="height: 100px; animation-duration: 7s; animation-delay: 4s;"></div>
+  </div>
+
+  <div class="max-w-5xl relative z-10">
     
-    <div class="inline-block mb-4 px-3 py-1 border border-indigo-500/30 rounded-full bg-indigo-500/10 text-indigo-300 text-sm font-medium tracking-wide">
-      Portefolio
+    <div class="reveal-text mb-6 md:mb-8">
+        <div class="hero-tag inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-700/50 bg-zinc-900/60 text-[10px] sm:text-[11px] uppercase tracking-widest font-medium text-zinc-300 backdrop-blur-md shadow-lg">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></span>
+            Disponible pour de nouveaux défis
+        </div>
     </div>
 
-    <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
-      <span class="bg-gradient-to-r from-white via-indigo-100 to-indigo-400 bg-clip-text text-transparent">
-        Jean-Félix Tchicaya Rudy
-      </span>
+    <h1 class="text-[12vw] sm:text-6xl md:text-8xl lg:text-9xl font-bold mb-4 md:mb-6 tracking-tighter text-white leading-[1.1] md:leading-[0.95]">
+      <div class="reveal-text"><span class="hero-line block">Ingénieur</span></div>
+      <div class="reveal-text"><span class="hero-line block shimmer">Data & Web.</span></div>
     </h1>
 
-    <div class="text-xl md:text-2xl text-slate-400 mb-8 h-8 font-light">
-      <span id="typed-text"></span><span class="animate-blink">|</span>
+    <div class="reveal-text max-w-xl mb-8 md:mb-12">
+        <p class="hero-desc text-zinc-300 text-base md:text-lg font-light leading-relaxed">
+            <strong class="text-white font-medium">Jean-Félix Tchicaya Rudy.</strong><br>
+            Je transforme des ensembles de données complexes en décisions stratégiques, et je conçois des interfaces web haut de gamme, rapides et intuitives.
+        </p>
     </div>
 
-    <p class="max-w-2xl mx-auto text-slate-400 mb-10 leading-relaxed text-lg">
-      Etudiant en Data science. Je fusionne 
-      <span class="text-indigo-400 font-semibold">l'analyse de données</span> et 
-      <span class="text-purple-400 font-semibold">le développement web</span> pour créer des applications intelligentes et performantes.
-    </p>
-
-    <div class="flex flex-wrap justify-center gap-4">
-      <a href="#projects" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-all transform hover:-translate-y-1 shadow-lg shadow-indigo-500/25">
-        Voir mes projets
+    <div class="reveal-btn-container flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+      <a href="#projects" class="hero-btn text-center px-8 py-4 bg-white text-black rounded-full font-medium transition-transform hover:scale-105 duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]">
+        Découvrir les projets
       </a>
-      <a href="assets/CV_JeanFelixTchicaya.pdf" target="_blank" class="px-8 py-3 glass-effect hover:bg-white/5 rounded-xl transition-all transform hover:-translate-y-1">
-        Télécharger mon CV
-      </a>
-      <a href="https://www.linkedin.com/in/rudy-jean-felix-tchicaya-a7aa3a2a1/" target="_blank"
-         class="px-4 py-3 glass-effect hover:bg-[#0077b5] hover:border-[#0077b5] rounded-xl transition-all group">
-         <svg class="w-6 h-6 fill-slate-300 group-hover:fill-white" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+      <a href="assets/CV_JeanFelixTchicaya.pdf" target="_blank" class="hero-btn text-center px-8 py-4 bg-zinc-900/60 backdrop-blur-xl border border-zinc-600/50 text-white rounded-full font-medium hover:bg-zinc-800 transition-colors duration-300">
+        Télécharger le CV
       </a>
     </div>
   </div>
 </section>
 
-<section id="projects" class="py-24 px-6 relative">
-  <div class="max-w-6xl mx-auto">
-    <div class="flex items-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-bold text-white">Projets Réalisés</h2>
-        <div class="h-1 flex-grow bg-slate-800 ml-6 rounded-full"></div>
+<section id="projects" class="py-20 md:py-24 px-6 md:px-12 lg:px-24 relative z-10 bg-black">
+  <div class="max-w-7xl mx-auto">
+    <div class="mb-12 md:mb-16" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight">Travaux Récents</h2>
     </div>
 
-    <div class="grid md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[300px]">
 
-      <div onclick="openModal(['assets/images/sotu_1.jpeg', 'assets/images/sotu_2.jpeg'])"
-           class="group glass-effect rounded-2xl overflow-hidden cursor-pointer hover:border-indigo-500/50 transition-all duration-300"
-           data-aos="fade-up">
-        <div class="relative h-64 overflow-hidden">
-          <img src="assets/images/sotu_1.jpeg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="SOTU Dashboard">
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-80"></div>
-          
-          <div class="absolute top-4 right-4 bg-black/50 px-2 py-1 rounded text-xs text-white flex items-center gap-1 backdrop-blur-sm">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            Galerie
-          </div>
-
-          <div class="absolute bottom-4 left-4 right-4">
-             <h3 class="text-2xl font-bold text-white mb-1">SOTU - Trafic Urbain</h3>
-             <p class="text-indigo-300 text-sm">Janvier 2026</p>
-          </div>
+      <div onclick="openProject('SOTU - Trafic Urbain', 'Janvier 2026', 'Outil d\'aide à la décision pour la régulation routière. Pipeline ETL pour le nettoyage de données capteurs et calcul d\'un Indice de Fluidité. Visualisation cartographique (Heatmap) des zones de congestion.', ['Python', 'Django', 'ETL', 'Pandas'], ['assets/images/sotu_1.jpeg', 'assets/images/sotu_2.jpeg'])"
+           class="bento-card rounded-3xl overflow-hidden cursor-pointer group md:col-span-2 md:row-span-2 relative flex flex-col" data-aos="fade-up">
+        <div class="absolute inset-0 bg-zinc-800/50 -z-10">
+            <img src="assets/images/sotu_1.jpeg" class="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700" alt="SOTU">
         </div>
-        <div class="p-6">
-          <p class="text-slate-300 mb-5 leading-relaxed text-sm">
-            Outil d'aide à la décision pour la régulation routière. Pipeline ETL (Pandas) pour le nettoyage de données capteurs et calcul d'un "Indice de Fluidité". Visualisation cartographique (Heatmap) des zones de congestion.
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">Python/Django</span>
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">ETL</span>
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">Data Viz</span>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+        
+        <div class="mt-auto p-6 md:p-8 relative z-10">
+          <div class="flex gap-2 mb-3 md:mb-4">
+            <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-medium text-white">Data Science</span>
           </div>
+          <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">SOTU - Trafic Urbain</h3>
+          <p class="text-zinc-400 text-sm md:text-base max-w-lg line-clamp-2 md:line-clamp-none">Régulation routière par l'analyse de données et la visualisation cartographique avancée.</p>
         </div>
       </div>
 
-      <div onclick="openModal(['assets/images/supermarket_1.jpeg', 'assets/images/supermarket_2.jpeg'])"
-           class="group glass-effect rounded-2xl overflow-hidden cursor-pointer hover:border-indigo-500/50 transition-all duration-300"
-           data-aos="fade-up" data-aos-delay="100">
-        <div class="relative h-64 overflow-hidden">
-          <img src="assets/images/supermarket_1.jpeg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Supermarket MS">
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-80"></div>
-          <div class="absolute top-4 right-4 bg-black/50 px-2 py-1 rounded text-xs text-white flex items-center gap-1 backdrop-blur-sm">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            Galerie
-          </div>
-          <div class="absolute bottom-4 left-4 right-4">
-             <h3 class="text-2xl font-bold text-white mb-1">Supermarket MS</h3>
-             <p class="text-indigo-300 text-sm">Décembre 2025</p>
-          </div>
+      <div onclick="openProject('Supermarket MS', 'Décembre 2025', 'Plateforme de gestion complète : Interface caissier (POS) temps réel et Dashboard managérial. Analyse des tendances de vente et gestion de stock automatisée.', ['Full-Stack', 'BI', 'Pandas'], ['assets/images/supermarket_1.jpeg', 'assets/images/supermarket_2.jpeg'])"
+           class="bento-card rounded-3xl overflow-hidden cursor-pointer group md:row-span-2 relative flex flex-col" data-aos="fade-up" data-aos-delay="100">
+        <div class="absolute inset-0 -z-10">
+            <img src="assets/images/supermarket_1.jpeg" class="w-full h-full object-cover opacity-40 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700" alt="Supermarket">
         </div>
-        <div class="p-6">
-          <p class="text-slate-300 mb-5 leading-relaxed text-sm">
-            Plateforme de gestion complète : Interface caissier (POS) temps réel et Dashboard managérial. Analyse des tendances de vente et gestion de stock automatisée avec Pandas et Matplotlib.
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">Full-Stack</span>
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">Business Intelligence</span>
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">Pandas</span>
-          </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+        <div class="mt-auto p-6 relative z-10">
+          <h3 class="text-xl md:text-2xl font-bold text-white mb-2">Supermarket MS</h3>
+          <p class="text-zinc-400 text-xs md:text-sm">Dashboard managérial & POS temps réel.</p>
         </div>
       </div>
 
-      <div onclick="openModal(['assets/images/Fut-Bot.jpeg'])"
-           class="group glass-effect rounded-2xl overflow-hidden cursor-pointer hover:border-indigo-500/50 transition-all duration-300"
-           data-aos="fade-up" data-aos-delay="200">
-        <div class="relative h-64 overflow-hidden">
-          <img src="assets/images/Fut-Bot.jpeg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Football ML">
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-80"></div>
-          <div class="absolute bottom-4 left-4 right-4">
-             <h3 class="text-2xl font-bold text-white mb-1">Prédiction de Matchs</h3>
-             <p class="text-indigo-300 text-sm">Juin 2025</p>
-          </div>
+      <div onclick="openProject('Prédiction de Matchs', 'Juin 2025', 'Modèles d\'apprentissage supervisé (Random Forest, XGBoost) avec un pipeline de traitement de données pour la prédiction de résultats sportifs.', ['Machine Learning', 'XGBoost'], ['assets/images/Fut-Bot.jpeg'])"
+           class="bento-card rounded-3xl overflow-hidden cursor-pointer group relative flex flex-col p-6" data-aos="fade-up">
+        <div class="flex-grow flex items-center justify-center mb-4 overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800">
+             <img src="assets/images/Fut-Bot.jpeg" class="w-full h-full object-cover opacity-50 group-hover:opacity-80 group-hover:scale-110 transition-all duration-500" alt="Fut-Bot">
         </div>
-        <div class="p-6">
-          <p class="text-slate-300 mb-5 leading-relaxed text-sm">
-            Application de Machine Learning utilisant des modèles d'apprentissage supervisé (Random Forest, XGBoost) avec un pipeline de traitement de données pour la prédiction de résultats sportifs réels.
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">Machine Learning</span>
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">XGBoost</span>
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">Scikit-Learn</span>
-          </div>
-        </div>
+        <h3 class="text-lg md:text-xl font-bold text-white">Fut-Bot Predictor</h3>
+        <p class="text-zinc-500 text-xs md:text-sm mt-1">Modèles ML pour pronostics sportifs.</p>
       </div>
 
-      <div onclick="openModal(['assets/images/elearning_1.jpeg', 'assets/images/elearning_2.jpeg'])"
-           class="group glass-effect rounded-2xl overflow-hidden cursor-pointer hover:border-indigo-500/50 transition-all duration-300"
-           data-aos="fade-up" data-aos-delay="300">
-        <div class="relative h-64 overflow-hidden">
-          <img src="assets/images/elearning_1.jpeg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="E-learning Platform">
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-80"></div>
-          <div class="absolute top-4 right-4 bg-black/50 px-2 py-1 rounded text-xs text-white flex items-center gap-1 backdrop-blur-sm">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            Galerie
-          </div>
-          <div class="absolute bottom-4 left-4 right-4">
-             <h3 class="text-2xl font-bold text-white mb-1">Plateforme E-learning</h3>
-             <p class="text-indigo-300 text-sm">Mars 2025</p>
-          </div>
+      <div onclick="openProject('Plateforme E-learning', 'Mars 2025', 'Plateforme d\'apprentissage en ligne. Création de cours, quiz dynamiques et système de messagerie intégrée.', ['Django', 'SQL'], ['assets/images/elearning_1.jpeg', 'assets/images/elearning_2.jpeg'])"
+           class="bento-card rounded-3xl overflow-hidden cursor-pointer group relative flex flex-col p-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="flex-grow flex items-center justify-center mb-4 overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800">
+            <img src="assets/images/elearning_1.jpeg" class="w-full h-full object-cover opacity-50 group-hover:opacity-80 group-hover:scale-110 transition-all duration-500" alt="E-learning">
         </div>
-        <div class="p-6">
-          <p class="text-slate-300 mb-5 leading-relaxed text-sm">
-            Plateforme d'apprentissage en ligne pour professeurs et étudiants. Fonctionnalités de création de cours, quiz interactifs dynamiques et système de messagerie intégrée.
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">Django</span>
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">Web Dev</span>
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">SQL</span>
-          </div>
-        </div>
+        <h3 class="text-lg md:text-xl font-bold text-white">E-learning System</h3>
+        <p class="text-zinc-500 text-xs md:text-sm mt-1">Éducation connectée et interactive.</p>
       </div>
 
-      <div onclick="openModal(['assets/images/Der.jpeg'])"
-           class="group glass-effect rounded-2xl overflow-hidden cursor-pointer hover:border-indigo-500/50 transition-all duration-300"
-           data-aos="fade-up" data-aos-delay="400">
-        <div class="relative h-64 overflow-hidden">
-          <img src="assets/images/Der.jpeg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Site de Nettoyage">
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-80"></div>
-          <div class="absolute bottom-4 left-4 right-4">
-             <h3 class="text-2xl font-bold text-white mb-1">Site de Nettoyage</h3>
-             <p class="text-indigo-300 text-sm">Février 2025</p>
-          </div>
+      <div onclick="openProject('Design & Sites Vitrines', '2024 - 2025', 'Développement frontend de sites vitrines et e-commerce. Intégration de maquettes, design minimaliste et optimisation pour la conversion et le référencement (SEO).', ['Frontend', 'UI/UX', 'SEO'], ['assets/images/Der.jpeg', 'assets/images/PGML1.jpeg'])"
+           class="bento-card rounded-3xl overflow-hidden cursor-pointer group md:col-span-2 relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6" data-aos="fade-up" data-aos-delay="200">
+        
+        <div class="relative z-10 w-full md:max-w-sm">
+            <div class="inline-block px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] text-emerald-400 font-bold uppercase tracking-widest mb-3 md:mb-4">Expertise Web</div>
+            <h3 class="text-xl md:text-2xl font-bold text-white mb-2">Interfaces Frontend</h3>
+            <p class="text-zinc-400 text-xs md:text-sm mb-4">Création de sites vitrines et plateformes E-commerce avec un design premium axé sur l'expérience utilisateur et la conversion.</p>
         </div>
-        <div class="p-6">
-          <p class="text-slate-300 mb-5 leading-relaxed text-sm">
-            Site vitrine professionnel pour une entreprise de nettoyage. Présentation des services, système de réservation en ligne et formulaire de contact dynamique.
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">HTML / CSS</span>
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">JavaScript</span>
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">Frontend</span>
-          </div>
-        </div>
-      </div>
 
-      <div onclick="openModal(['assets/images/PGML1.jpeg'])"
-           class="group glass-effect rounded-2xl overflow-hidden cursor-pointer hover:border-indigo-500/50 transition-all duration-300"
-           data-aos="fade-up" data-aos-delay="500">
-        <div class="relative h-64 overflow-hidden">
-          <img src="assets/images/PGML1.jpeg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="E-commerce Lunettes">
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-80"></div>
-          <div class="absolute bottom-4 left-4 right-4">
-             <h3 class="text-2xl font-bold text-white mb-1">E-commerce Lunettes</h3>
-             <p class="text-indigo-300 text-sm">Octobre 2024</p>
-          </div>
-        </div>
-        <div class="p-6">
-          <p class="text-slate-300 mb-5 leading-relaxed text-sm">
-            Site de vente en ligne. Catalogue produits interactif, gestion du panier en temps réel et logique de commande simulée.
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">HTML / CSS</span>
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">JavaScript</span>
-            <span class="px-3 py-1 text-xs bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/20">E-commerce</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<section class="py-24 px-6 bg-slate-900/50 border-y border-white/5">
-  <div class="max-w-5xl mx-auto">
-    <h2 class="text-3xl font-bold mb-10">Compétences Techniques</h2>
-    <div class="grid md:grid-cols-2 gap-8">
-        <div>
-            <h3 class="text-xl font-semibold mb-4 text-indigo-400">Data Science & IA</h3>
-            <div class="flex flex-wrap gap-2">
-                <span class="px-4 py-2 bg-slate-800 rounded-lg text-sm border border-slate-700">Python</span>
-                <span class="px-4 py-2 bg-slate-800 rounded-lg text-sm border border-slate-700">Pandas / NumPy</span>
-                <span class="px-4 py-2 bg-slate-800 rounded-lg text-sm border border-slate-700">Scikit-Learn</span>
-                <span class="px-4 py-2 bg-slate-800 rounded-lg text-sm border border-slate-700">Machine Learning</span>
-                <span class="px-4 py-2 bg-slate-800 rounded-lg text-sm border border-slate-700">Power BI</span>
+        <div class="hidden sm:flex w-full md:w-64 h-40 relative rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden transform group-hover:-translate-y-2 group-hover:shadow-2xl group-hover:shadow-emerald-500/10 transition-all duration-500 z-10 flex-shrink-0">
+            <div class="p-2 border-b border-zinc-800 bg-zinc-950 flex gap-1.5 items-center">
+                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+            </div>
+            <div class="p-4 flex gap-4 h-full">
+                <div class="w-1/3 bg-zinc-800/50 rounded-lg h-full"></div>
+                <div class="w-2/3 space-y-2">
+                    <div class="h-3 w-3/4 bg-zinc-800 rounded"></div>
+                    <div class="h-2 w-full bg-zinc-800/50 rounded"></div>
+                    <div class="h-2 w-5/6 bg-zinc-800/50 rounded"></div>
+                    <div class="mt-4 h-6 w-1/2 bg-emerald-500/20 rounded border border-emerald-500/30"></div>
+                </div>
             </div>
         </div>
-        <div>
-            <h3 class="text-xl font-semibold mb-4 text-purple-400">Développement Web</h3>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="skills" class="py-20 md:py-24 px-6 md:px-12 lg:px-24 border-t border-white/5 relative z-10 bg-black">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
+    
+    <div data-aos="fade-up">
+      <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-white tracking-tight">Expertise Technique</h2>
+      <div class="space-y-4 md:space-y-6">
+        <div class="p-5 md:p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/50 hover:bg-zinc-900 transition-colors">
+            <h3 class="text-base md:text-lg font-semibold text-white mb-3 md:mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                Data Science & IA
+            </h3>
             <div class="flex flex-wrap gap-2">
-                <span class="px-4 py-2 bg-slate-800 rounded-lg text-sm border border-slate-700">Django Framework</span>
-                <span class="px-4 py-2 bg-slate-800 rounded-lg text-sm border border-slate-700">HTML / CSS</span>
-                <span class="px-4 py-2 bg-slate-800 rounded-lg text-sm border border-slate-700">JavaScript</span>
-                <span class="px-4 py-2 bg-slate-800 rounded-lg text-sm border border-slate-700">PostgreSQL / SQL</span>
-                <span class="px-4 py-2 bg-slate-800 rounded-lg text-sm border border-slate-700">Git / GitHub</span>
+                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">Python</span>
+                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">Pandas / NumPy</span>
+                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">Scikit-Learn</span>
+                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">Power BI</span>
             </div>
         </div>
+        <div class="p-5 md:p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/50 hover:bg-zinc-900 transition-colors">
+            <h3 class="text-base md:text-lg font-semibold text-white mb-3 md:mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                Développement Web
+            </h3>
+            <div class="flex flex-wrap gap-2">
+                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">Django</span>
+                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">JavaScript</span>
+                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">Tailwind CSS</span>
+                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">PostgreSQL</span>
+            </div>
+        </div>
+      </div>
     </div>
+
+    <div data-aos="fade-up" data-aos-delay="100">
+      <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-white tracking-tight">Parcours</h2>
+      <div class="relative border-l border-zinc-800 ml-3 space-y-8 md:space-y-10 py-2">
+        <div class="relative pl-6 md:pl-8">
+          <span class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-white ring-8 ring-black"></span>
+          <h3 class="text-lg md:text-xl font-bold text-white">Licence Informatique & Data</h3>
+          <p class="text-zinc-500 text-xs md:text-sm font-medium mt-1">2024 – Présent | BEM TECH Dakar</p>
+          <p class="mt-2 md:mt-3 text-zinc-400 text-xs md:text-sm leading-relaxed">Spécialisation en Big Data, Algorithmique avancée et IA. Création de pipelines ETL et modèles prédictifs.</p>
+        </div>
+        <div class="relative pl-6 md:pl-8">
+          <span class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-zinc-700 ring-8 ring-black"></span>
+          <h3 class="text-lg md:text-xl font-bold text-white">Baccalauréat Scientifique</h3>
+          <p class="text-zinc-500 text-xs md:text-sm font-medium mt-1">2023 | Lycée Dom Helder Camara</p>
+          <p class="mt-2 md:mt-3 text-zinc-400 text-xs md:text-sm leading-relaxed">Série D, Mention Bien. Solides bases en mathématiques structurant une approche analytique.</p>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
-<section class="py-24 px-6" data-aos="fade-up">
-  <div class="max-w-4xl mx-auto">
-    <h2 class="text-3xl font-bold mb-10">Parcours Académique</h2>
-    <div class="relative border-l-2 border-slate-800 ml-3 space-y-12">
-      <div class="relative pl-8">
-        <span class="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-indigo-500 ring-4 ring-slate-900"></span>
-        <h3 class="text-2xl font-bold text-white">Licence Informatique & Science des Données</h3>
-        <span class="text-indigo-400 text-sm font-medium">2024 – Présent | BEM TECH Dakar</span>
-        <p class="mt-2 text-slate-400">Spécialisation en Big Data, Algorithmique avancée et Intelligence Artificielle.</p>
-      </div>
-      <div class="relative pl-8">
-        <span class="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-slate-600 ring-4 ring-slate-900"></span>
-        <h3 class="text-2xl font-bold text-white">Baccalauréat Scientifique (Série D)</h3>
-        <span class="text-slate-500 text-sm font-medium">2023 | Lycée Dom Helder Camara</span>
-        <p class="mt-2 text-slate-400">Mention Bien. Solides bases en mathématiques et sciences physiques.</p>
-      </div>
-    </div>
+<footer class="py-10 md:py-12 border-t border-white/5 text-center relative z-10 bg-black">
+  <div class="flex justify-center gap-6 md:gap-8 mb-4 md:mb-6">
+    <a href="https://www.linkedin.com/in/rudy-jean-felix-tchicaya-a7aa3a2a1/" target="_blank" class="text-zinc-500 hover:text-white transition-colors text-xs md:text-sm font-medium">LinkedIn</a>
+    <a href="mailto:tchicayarudy071@gmail.com" class="text-zinc-500 hover:text-white transition-colors text-xs md:text-sm font-medium">Email</a>
   </div>
-</section>
-
-<footer class="py-12 bg-black border-t border-white/10 text-center">
-  <div class="mb-6 flex justify-center gap-6">
-    <a href="https://www.linkedin.com/in/rudy-jean-felix-tchicaya-a7aa3a2a1/" class="text-slate-400 hover:text-white transition-colors">LinkedIn</a>
-    <a href="mailto:tchicayarudy071@gmail.com" class="text-slate-400 hover:text-white transition-colors">Email</a>
-    <a href="#" class="text-slate-400 hover:text-white transition-colors">GitHub</a>
-  </div>
-  <p class="text-slate-600 text-sm">© 2026 — Jean-Félix Tchicaya Rudy. Tous droits réservés.</p>
+  <p class="text-zinc-600 text-xs md:text-sm">© 2026 — Jean-Félix Tchicaya Rudy.</p>
 </footer>
 
-<div id="projectModal" class="fixed inset-0 z-50 hidden bg-black/95 backdrop-blur-md items-center justify-center p-4 transition-all duration-300 opacity-0" 
-     onclick="closeModalOnBackground(event)">
-    
-    <button onclick="closeModal()" class="fixed top-6 right-6 z-[60] p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition-all">
-        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+<div id="drawerOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] opacity-0 pointer-events-none transition-opacity duration-500" onclick="closeDrawer()"></div>
+
+<div id="projectDrawer" class="fixed top-0 right-0 h-full w-full max-w-2xl bg-[#050505] border-l border-zinc-900 z-[70] transform translate-x-full transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-y-auto">
+    <button onclick="closeDrawer()" class="fixed top-4 right-4 md:top-6 md:right-6 text-zinc-400 hover:text-white bg-zinc-900 hover:bg-zinc-800 p-2 md:p-3 rounded-full transition-all z-50 shadow-lg">
+        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
     </button>
-
-    <div class="relative w-full max-w-6xl flex flex-col items-center" id="modalContent">
+    
+    <div class="p-6 pt-20 md:p-12 md:pt-24">
+        <span id="drawerDate" class="text-zinc-500 text-xs md:text-sm font-mono uppercase mb-2 md:mb-3 block"></span>
+        <h2 id="drawerTitle" class="text-3xl md:text-4xl font-bold text-white mb-4 md:mb-6 tracking-tighter"></h2>
         
-        <div class="relative w-full flex items-center justify-center group">
-            
-            <button id="prevBtn" onclick="prevImage()" class="absolute left-0 md:-left-12 z-20 p-3 bg-black/50 hover:bg-indigo-600 rounded-full text-white transition-all hidden">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-
-            <div class="modal-image-container">
-                <img id="modalImage" src="" alt="Project Detail" class="modal-image shadow-2xl">
-            </div>
-
-            <button id="nextBtn" onclick="nextImage()" class="absolute right-0 md:-right-12 z-20 p-3 bg-black/50 hover:bg-indigo-600 rounded-full text-white transition-all hidden">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-            </button>
-        </div>
-
-        <div id="imageCounter" class="mt-4 text-slate-400 text-sm font-medium tracking-widest hidden">
-            1 / 3
-        </div>
-
+        <div id="drawerTags" class="flex flex-wrap gap-2 mb-6 md:mb-8"></div>
+        <p id="drawerDesc" class="text-base md:text-lg text-zinc-400 leading-relaxed mb-8 md:mb-12 font-light"></p>
+        <div id="drawerGallery" class="space-y-4 md:space-y-6 pb-12"></div>
     </div>
 </div>
 
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-  // Init animations
-  AOS.init({ duration: 800, once: true, offset: 100 });
+    AOS.init({ duration: 800, once: true, offset: 50 });
 
-  // Machine à écrire
-  const texts = ['Data Science & IA', 'Machine Learning', 'Développement Full-Stack'];
-  let index = 0, charIndex = 0;
-  const target = document.getElementById('typed-text');
+    // --- CURSEUR & MASQUE INTERACTIF ---
+    if (window.matchMedia("(pointer: fine)").matches) {
+        let xTo = gsap.quickTo("#cursor", "x", {duration: 0.1, ease: "power3"});
+        let yTo = gsap.quickTo("#cursor", "y", {duration: 0.1, ease: "power3"});
+        const cursorEl = document.getElementById('cursor');
+        const gridMask = document.getElementById('grid-mask');
 
-  function type() {
-    if (charIndex < texts[index].length) {
-      target.textContent += texts[index][charIndex++];
-      setTimeout(type, 80);
-    } else { setTimeout(erase, 2000); }
-  }
-  function erase() {
-    if (charIndex > 0) {
-      target.textContent = texts[index].substring(0, --charIndex);
-      setTimeout(erase, 40);
-    } else {
-      index = (index + 1) % texts.length;
-      setTimeout(type, 500);
+        window.addEventListener('mousemove', e => {
+            xTo(e.clientX);
+            yTo(e.clientY);
+            
+            if(gridMask) {
+                gridMask.style.setProperty('--x', e.clientX + 'px');
+                gridMask.style.setProperty('--y', e.clientY + 'px');
+            }
+        });
+
+        document.querySelectorAll('a, button, .bento-card').forEach(el => {
+            el.addEventListener('mouseenter', () => cursorEl.style.transform = 'translate(-50%, -50%) scale(2.5)');
+            el.addEventListener('mouseleave', () => cursorEl.style.transform = 'translate(-50%, -50%) scale(1)');
+        });
     }
-  }
-  type();
 
-  // --- LOGIQUE DU CAROUSEL ---
-  const modal = document.getElementById('projectModal');
-  const modalContent = document.getElementById('modalContent');
-  const modalImg = document.getElementById('modalImage');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  const counter = document.getElementById('imageCounter');
+    // --- GSAP TEXT REVEAL ---
+    window.addEventListener('load', () => {
+        const tl = gsap.timeline();
+        tl.from(".hero-tag", { y: 20, opacity: 0, duration: 0.8, ease: "power4.out" })
+          .from(".hero-line", { y: 100, duration: 1.2, ease: "power4.out", stagger: 0.1 }, "-=0.6")
+          .from(".hero-desc", { y: 30, opacity: 0, duration: 1, ease: "power3.out" }, "-=0.8")
+          .from(".hero-btn", { y: 20, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power3.out" }, "-=0.8");
+    });
 
-  let currentImages = [];
-  let currentImageIndex = 0;
+    // --- DRAWER LOGIC ---
+    function openProject(title, date, desc, tags, images) {
+        document.getElementById('drawerTitle').innerText = title;
+        document.getElementById('drawerDate').innerText = date;
+        document.getElementById('drawerDesc').innerText = desc;
+        
+        const tagContainer = document.getElementById('drawerTags');
+        tagContainer.innerHTML = '';
+        tags.forEach(t => {
+            tagContainer.innerHTML += `<span class="px-2 md:px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-xs md:text-sm text-zinc-300">${t}</span>`;
+        });
+        
+        const gallery = document.getElementById('drawerGallery');
+        gallery.innerHTML = '';
+        images.forEach(img => {
+            gallery.innerHTML += `<img src="${img}" class="w-full rounded-xl md:rounded-2xl border border-zinc-800 shadow-lg object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzE4MTgxYiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iYXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM1MjUyNWIiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkltYWdlIG5vbiB0cm91dsOpZTwvdGV4dD48L3N2Zz4='">`;
+        });
 
-  function openModal(imagesSource) {
-    // Si c'est une chaîne unique, on la transforme en tableau pour uniformiser
-    if (typeof imagesSource === 'string') {
-        currentImages = [imagesSource];
-    } else {
-        currentImages = imagesSource;
+        document.body.classList.add('drawer-open');
+        document.getElementById('drawerOverlay').classList.remove('pointer-events-none', 'opacity-0');
+        document.getElementById('projectDrawer').classList.remove('translate-x-full');
     }
-    
-    currentImageIndex = 0;
-    updateModalImage();
-    
-    modal.classList.remove('hidden');
-    setTimeout(() => {
-        modal.classList.remove('opacity-0');
-        modalContent.classList.remove('scale-95');
-        modalContent.classList.add('scale-100');
-    }, 10);
-    document.body.classList.add('modal-open');
-  }
 
-  function updateModalImage() {
-    // Animation fade out/in
-    modalImg.style.opacity = '0.5';
-    setTimeout(() => {
-        modalImg.src = currentImages[currentImageIndex];
-        modalImg.style.opacity = '1';
-    }, 150);
-
-    // Gérer l'affichage des boutons
-    if (currentImages.length > 1) {
-        prevBtn.classList.remove('hidden');
-        nextBtn.classList.remove('hidden');
-        counter.classList.remove('hidden');
-        counter.textContent = `${currentImageIndex + 1} / ${currentImages.length}`;
-    } else {
-        prevBtn.classList.add('hidden');
-        nextBtn.classList.add('hidden');
-        counter.classList.add('hidden');
+    function closeDrawer() {
+        document.body.classList.remove('drawer-open');
+        document.getElementById('drawerOverlay').classList.add('pointer-events-none', 'opacity-0');
+        document.getElementById('projectDrawer').classList.add('translate-x-full');
     }
-  }
 
-  function nextImage() {
-    currentImageIndex = (currentImageIndex + 1) % currentImages.length;
-    updateModalImage();
-  }
-
-  function prevImage() {
-    currentImageIndex = (currentImageIndex - 1 + currentImages.length) % currentImages.length;
-    updateModalImage();
-  }
-
-  function closeModal() {
-    modal.classList.add('opacity-0');
-    modalContent.classList.remove('scale-100');
-    modalContent.classList.add('scale-95');
-    setTimeout(() => {
-        modal.classList.add('hidden');
-        modalImg.src = ''; 
-    }, 300);
-    document.body.classList.remove('modal-open');
-  }
-
-  function closeModalOnBackground(e) {
-    if (e.target === modal) closeModal();
-  }
-
-  // Navigation au clavier
-  document.addEventListener('keydown', (e) => {
-    if (modal.classList.contains('hidden')) return;
-    if (e.key === 'Escape') closeModal();
-    if (e.key === 'ArrowRight') nextImage();
-    if (e.key === 'ArrowLeft') prevImage();
-  });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeDrawer();
+    });
 </script>
 
 </body>
