@@ -33,6 +33,10 @@
     
     body { font-family: 'Inter', sans-serif; overflow-x: hidden; background-color: #000; }
     body.drawer-open { overflow: hidden; }
+
+    /* LOGIQUE DE TRADUCTION FR/EN */
+    body:not(.lang-en) .en { display: none !important; }
+    body.lang-en .fr { display: none !important; }
     
     .bento-card {
       background-color: #09090b;
@@ -46,7 +50,7 @@
       transform: translateY(-2px);
     }
 
-    /* Custom Cursor - Retour à 20px */
+    /* Custom Cursor */
     #cursor {
       width: 20px; height: 20px;
       background: white; border-radius: 50%;
@@ -54,6 +58,25 @@
       mix-blend-mode: difference;
       transform: translate(-50%, -50%);
       transition: width 0.2s, height 0.2s;
+      will-change: transform;
+    }
+
+    /* Halo lumineux GPU */
+    #glow {
+      position: fixed;
+      top: 0; left: 0;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 15;
+      transform: translate(-50%, -50%);
+      will-change: transform;
+      display: none;
+    }
+
+    @media (pointer: fine) {
+      #glow { display: block; }
     }
 
     @media (hover: none) and (pointer: coarse) {
@@ -61,9 +84,7 @@
       * { cursor: auto !important; }
     }
 
-    /* Padding ajouté pour éviter que le clip-path ne rogne le glow du bouton */
     .reveal-text { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
-    .reveal-btn-container { clip-path: polygon(-10% -10%, 110% -10%, 110% 110%, -10% 110%); }
 
     .shimmer {
       background: linear-gradient(90deg, #52525b 0%, #ffffff 50%, #52525b 100%);
@@ -76,24 +97,10 @@
 
     @keyframes shine { to { background-position: 200% center; } }
 
-    /* BACKGROUND DATA GRID & BEAMS */
+    /* BACKGROUND DATA GRID */
     .bg-grid {
       background-size: 40px 40px;
       background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-    }
-    
-    .bg-grid-bright {
-      background-size: 40px 40px;
-      background-image: radial-gradient(circle, rgba(16, 185, 129, 0.4) 1px, transparent 1px);
-    }
-
-    .mouse-mask {
-      -webkit-mask-image: radial-gradient(circle 350px at var(--x, 50%) var(--y, 50%), black 0%, transparent 100%);
-      mask-image: radial-gradient(circle 350px at var(--x, 50%) var(--y, 50%), black 0%, transparent 100%);
-    }
-
-    @media (hover: none) and (pointer: coarse) {
-      .mouse-mask { mask-image: none; -webkit-mask-image: none; opacity: 0.3; }
     }
 
     .data-beam {
@@ -121,12 +128,26 @@
 <body class="text-zinc-300 antialiased selection:bg-white selection:text-black relative">
 
 <div id="cursor"></div>
+<div id="glow"></div>
 
 <nav class="fixed top-0 w-full z-40 px-6 py-6 flex justify-between items-center mix-blend-difference">
-    <span class="text-white font-bold tracking-tighter text-2xl">JFT.</span>
-    <div class="hidden md:flex gap-8 text-xs font-semibold uppercase tracking-widest text-zinc-400">
-        <a href="#projects" class="hover:text-white transition-colors">Projets</a>
-        <a href="#skills" class="hover:text-white transition-colors">Parcours</a>
+    <span class="text-white font-bold tracking-tighter text-2xl">JFT</span>
+    <div class="flex items-center gap-8">
+        <div class="hidden md:flex gap-8 text-xs font-semibold uppercase tracking-widest text-zinc-400">
+            <a href="#projects" class="hover:text-white transition-colors">
+                <span class="fr">Projets</span><span class="en">Projects</span>
+            </a>
+            <a href="#skills" class="hover:text-white transition-colors">
+                <span class="fr">Parcours</span><span class="en">Journey</span>
+            </a>
+            <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+        </div>
+        
+        <button onclick="toggleLanguage()" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-700 hover:border-zinc-400 bg-zinc-900 transition-colors text-xs font-semibold text-white pointer-events-auto">
+            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="fr">EN</span>
+            <span class="en">FR</span>
+        </button>
     </div>
 </nav>
 
@@ -134,8 +155,6 @@
   
   <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
     <div class="absolute inset-0 bg-grid opacity-30"></div>
-    <div id="grid-mask" class="absolute inset-0 bg-grid-bright mouse-mask hidden sm:block"></div>
-
     <div class="data-beam left-[15%]" style="height: 150px; animation-duration: 5s; animation-delay: 1s;"></div>
     <div class="data-beam left-[35%]" style="height: 250px; animation-duration: 8s; animation-delay: 3s;"></div>
     <div class="data-beam left-[65%]" style="height: 180px; animation-duration: 6s; animation-delay: 0.5s;"></div>
@@ -147,28 +166,33 @@
     <div class="reveal-text mb-6 md:mb-8">
         <div class="hero-tag inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-700/50 bg-zinc-900/60 text-[10px] sm:text-[11px] uppercase tracking-widest font-medium text-zinc-300 backdrop-blur-md shadow-lg">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></span>
-            Disponible pour de nouveaux défis
+            <span class="fr">Recherche Stage : Data Science & IA</span>
+            <span class="en">Seeking Internship: Data Science & AI</span>
         </div>
     </div>
 
     <h1 class="text-[12vw] sm:text-6xl md:text-8xl lg:text-9xl font-bold mb-4 md:mb-6 tracking-tighter text-white leading-[1.1] md:leading-[0.95]">
-      <div class="reveal-text"><span class="hero-line block">Ingénieur</span></div>
+      <div class="reveal-text">
+        <span class="hero-line block fr">Ingénieur</span>
+        <span class="hero-line block en">Engineer</span>
+      </div>
       <div class="reveal-text"><span class="hero-line block shimmer">Data & Web.</span></div>
     </h1>
 
     <div class="reveal-text max-w-xl mb-8 md:mb-12">
         <p class="hero-desc text-zinc-300 text-base md:text-lg font-light leading-relaxed">
-            <strong class="text-white font-medium">Jean-Félix Tchicaya Rudy.</strong><br>
-            Je transforme des ensembles de données complexes en décisions stratégiques, et je conçois des interfaces web haut de gamme, rapides et intuitives.
+            <strong class="text-white font-bold text-xl md:text-2xl tracking-tight block mb-2">Jean-Félix Tchicaya Rudy.</strong>
+            <span class="fr">Étudiant en L3 (Informatique & Data). Je transforme des ensembles de données complexes en décisions stratégiques, et je conçois des interfaces web haut de gamme.</span>
+            <span class="en">L3 Student (Computer Science & Data). I transform complex datasets into strategic decisions and design premium bespoke web interfaces.</span>
         </p>
     </div>
 
-    <div class="reveal-btn-container flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-      <a href="#projects" class="hero-btn text-center px-8 py-4 bg-white text-black rounded-full font-medium transition-transform hover:scale-105 duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]">
-        Découvrir les projets
+    <div class="reveal-btn-container flex flex-col sm:flex-row gap-4 mt-6">
+      <a href="#projects" class="hero-btn flex items-center justify-center w-full sm:w-auto h-14 px-8 bg-white text-black rounded-full font-medium transition-transform hover:scale-105 duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+        <span class="fr">Découvrir les projets</span><span class="en">Discover projects</span>
       </a>
-      <a href="assets/CV_JeanFelixTchicaya.pdf" target="_blank" class="hero-btn text-center px-8 py-4 bg-zinc-900/60 backdrop-blur-xl border border-zinc-600/50 text-white rounded-full font-medium hover:bg-zinc-800 transition-colors duration-300">
-        Télécharger le CV
+      <a href="assets/images/cvrudy.pdf" target="_blank" class="hero-btn flex items-center justify-center w-full sm:w-auto h-14 px-8 bg-zinc-900 border border-zinc-700 text-white rounded-full font-medium hover:bg-zinc-800 transition-colors hover:scale-105 duration-300">
+        <span class="fr">Télécharger le CV</span><span class="en">Download Resume</span>
       </a>
     </div>
   </div>
@@ -177,148 +201,342 @@
 <section id="projects" class="py-20 md:py-24 px-6 md:px-12 lg:px-24 relative z-10 bg-black">
   <div class="max-w-7xl mx-auto">
     <div class="mb-12 md:mb-16" data-aos="fade-up">
-        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight">Travaux Récents</h2>
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+            <span class="fr">Travaux Récents</span><span class="en">Recent Works</span>
+        </h2>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[300px]">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[300px] mb-8">
 
-      <div onclick="openProject('SOTU - Trafic Urbain', 'Janvier 2026', 'Outil d\'aide à la décision pour la régulation routière. Pipeline ETL pour le nettoyage de données capteurs et calcul d\'un Indice de Fluidité. Visualisation cartographique (Heatmap) des zones de congestion.', ['Python', 'Django', 'ETL', 'Pandas'], ['assets/images/sotu_1.jpeg', 'assets/images/sotu_2.jpeg'])"
-           class="bento-card rounded-3xl overflow-hidden cursor-pointer group md:col-span-2 md:row-span-2 relative flex flex-col" data-aos="fade-up">
+      <div onclick="openProject('Safy Shop', '<span class=\'fr\'>En cours</span><span class=\'en\'>In progress</span>', '<span class=\'fr\'>Plateforme e-commerce haut de gamme en phase de finalisation. Architecture robuste pour la gestion du catalogue, panier dynamique, tunnel de paiement sécurisé et tableau de bord administrateur intuitif.</span><span class=\'en\'>Premium e-commerce platform in finalization phase. Robust architecture for catalog management, dynamic cart, secure checkout, and intuitive admin dashboard.</span>', ['Django', 'Python', 'Tailwind CSS', 'PostgreSQL'], ['assets/images/safyshop.png', 'assets/images/safyshopproduct.png'])"
+           class="bento-card rounded-3xl overflow-hidden cursor-pointer group md:col-span-2 md:row-span-2 relative flex flex-col border-emerald-500/20" data-aos="fade-up">
+        <div class="absolute inset-0 bg-zinc-900 -z-10">
+            <img src="assets/images/safyshopmain.png" class="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-700" alt="Safy Shop">
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+        
+        <div class="mt-auto p-8 md:p-10 relative z-10">
+          <div class="flex gap-2 mb-4">
+            <span class="px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-widest text-emerald-400">
+                <span class="fr">Projet Phare</span><span class="en">Flagship</span>
+            </span>
+            <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-medium text-white">E-commerce</span>
+          </div>
+          <h3 class="text-3xl md:text-5xl font-bold text-white mb-3 tracking-tight">Safy Shop</h3>
+          <p class="text-zinc-400 text-sm md:text-lg max-w-xl line-clamp-2">
+              <span class="fr">Plateforme e-commerce complète et pensée pour l'expérience utilisateur.</span>
+              <span class="en">Complete e-commerce platform built for the best user experience.</span>
+          </p>
+        </div>
+      </div>
+
+      <div onclick="openProject('SOTU', '<span class=\'fr\'>Janvier 2026</span><span class=\'en\'>January 2026</span>', '<span class=\'fr\'>Outil d\'aide à la décision pour la régulation routière. Pipeline ETL pour le nettoyage de données capteurs et calcul d\'un Indice de Fluidité. Visualisation cartographique (Heatmap) des zones de congestion.</span><span class=\'en\'>Decision support tool for traffic regulation. ETL pipeline for cleaning sensor data and calculating a Fluidity Index. Cartographic visualization (Heatmap) of congestion zones.</span>', ['Python', 'ETL', 'Pandas', 'Data Viz'], ['assets/images/sotu_1.jpeg', 'assets/images/sotu_2.jpeg'])"
+           class="bento-card rounded-3xl overflow-hidden cursor-pointer group md:row-span-2 relative flex flex-col" data-aos="fade-up" data-aos-delay="100">
         <div class="absolute inset-0 bg-zinc-800/50 -z-10">
-            <img src="assets/images/sotu_1.jpeg" class="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700" alt="SOTU">
+            <img src="assets/images/sotu_1.jpeg" class="w-full h-full object-cover opacity-40 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700" alt="SOTU">
         </div>
         <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-        
         <div class="mt-auto p-6 md:p-8 relative z-10">
-          <div class="flex gap-2 mb-3 md:mb-4">
+          <div class="flex gap-2 mb-3">
             <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-medium text-white">Data Science</span>
           </div>
-          <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2">SOTU - Trafic Urbain</h3>
-          <p class="text-zinc-400 text-sm md:text-base max-w-lg line-clamp-2 md:line-clamp-none">Régulation routière par l'analyse de données et la visualisation cartographique avancée.</p>
+          <h3 class="text-2xl md:text-3xl font-bold text-white mb-2">SOTU</h3>
+          <p class="text-zinc-400 text-xs md:text-sm">
+              <span class="fr">Régulation routière par l'analyse de données et cartographie.</span>
+              <span class="en">Traffic regulation via data analysis and mapping.</span>
+          </p>
         </div>
       </div>
 
-      <div onclick="openProject('Supermarket MS', 'Décembre 2025', 'Plateforme de gestion complète : Interface caissier (POS) temps réel et Dashboard managérial. Analyse des tendances de vente et gestion de stock automatisée.', ['Full-Stack', 'BI', 'Pandas'], ['assets/images/supermarket_1.jpeg', 'assets/images/supermarket_2.jpeg'])"
-           class="bento-card rounded-3xl overflow-hidden cursor-pointer group md:row-span-2 relative flex flex-col" data-aos="fade-up" data-aos-delay="100">
-        <div class="absolute inset-0 -z-10">
-            <img src="assets/images/supermarket_1.jpeg" class="w-full h-full object-cover opacity-40 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700" alt="Supermarket">
+      <div onclick="openProject('<span class=\'fr\'>Vitrines & Freelance</span><span class=\'en\'>Freelance & Bespoke</span>', '2024 - 2026', '<span class=\'fr\'>Conception d\'interfaces web sur-mesure. UI/UX premium, animations fluides et optimisation SEO pour des clients et le grand public.</span><span class=\'en\'>Design of bespoke web interfaces. Premium UI/UX, fluid animations, and SEO optimization for clients and the general public.</span>', ['Frontend', 'UI/UX', 'Tailwind', 'GSAP'], ['assets/images/portfoliomarc.png', 'assets/images/Der.jpeg'])"
+           class="bento-card rounded-3xl overflow-hidden cursor-pointer group md:col-span-2 relative flex flex-col p-6 md:p-8 justify-center" data-aos="fade-up">
+        <div class="absolute inset-0 bg-zinc-900/80 -z-10 overflow-hidden">
+             <div class="absolute right-0 bottom-0 opacity-40 w-1/2 h-full bg-[url('assets/images/portfomain.png')] bg-cover bg-left group-hover:scale-105 transition-transform duration-700"></div>
         </div>
-        <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
-        <div class="mt-auto p-6 relative z-10">
-          <h3 class="text-xl md:text-2xl font-bold text-white mb-2">Supermarket MS</h3>
-          <p class="text-zinc-400 text-xs md:text-sm">Dashboard managérial & POS temps réel.</p>
+        <div class="flex gap-2 mb-3 relative z-10">
+            <span class="px-3 py-1 bg-blue-500/20 border border-blue-500/30 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-widest text-blue-400">
+                <span class="fr">Services Freelance</span><span class="en">Freelance Services</span>
+            </span>
         </div>
+        <h3 class="text-xl md:text-3xl font-bold text-white mb-2 relative z-10">
+            <span class="fr">Freelance & Sites Vitrines</span><span class="en">Bespoke Web Interfaces</span>
+        </h3>
+        <p class="text-zinc-400 text-sm md:text-base max-w-md relative z-10">
+            <span class="fr">Création d'interfaces premium sur-mesure pour clients et professionnels. Design haut de gamme.</span>
+            <span class="en">Creation of custom premium interfaces for professionals. High-end design.</span>
+        </p>
       </div>
 
-      <div onclick="openProject('Prédiction de Matchs', 'Juin 2025', 'Modèles d\'apprentissage supervisé (Random Forest, XGBoost) avec un pipeline de traitement de données pour la prédiction de résultats sportifs.', ['Machine Learning', 'XGBoost'], ['assets/images/Fut-Bot.jpeg'])"
-           class="bento-card rounded-3xl overflow-hidden cursor-pointer group relative flex flex-col p-6" data-aos="fade-up">
-        <div class="flex-grow flex items-center justify-center mb-4 overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800">
-             <img src="assets/images/Fut-Bot.jpeg" class="w-full h-full object-cover opacity-50 group-hover:opacity-80 group-hover:scale-110 transition-all duration-500" alt="Fut-Bot">
-        </div>
-        <h3 class="text-lg md:text-xl font-bold text-white">Fut-Bot Predictor</h3>
-        <p class="text-zinc-500 text-xs md:text-sm mt-1">Modèles ML pour pronostics sportifs.</p>
-      </div>
-
-      <div onclick="openProject('Plateforme E-learning', 'Mars 2025', 'Plateforme d\'apprentissage en ligne. Création de cours, quiz dynamiques et système de messagerie intégrée.', ['Django', 'SQL'], ['assets/images/elearning_1.jpeg', 'assets/images/elearning_2.jpeg'])"
+      <div onclick="openProject('SI-ARC', '<span class=\'fr\'>Automne 2025</span><span class=\'en\'>Autumn 2025</span>', '<span class=\'fr\'>Développement d\'un moteur de scoring crédit. Modélisation du risque financier, traitement de données bancaires et intégration algorithmique pour automatiser la prise de décision sur l\'octroi de prêts.</span><span class=\'en\'>Development of a credit scoring engine. Financial risk modeling, banking data processing, and algorithmic integration to automate loan approval decisions.</span>', ['Python', 'Machine Learning', 'Fintech'], ['assets/images/SIARC.png', 'assets/images/SIARC2.png', 'assets/images/SIARC3.png'])"
            class="bento-card rounded-3xl overflow-hidden cursor-pointer group relative flex flex-col p-6" data-aos="fade-up" data-aos-delay="100">
         <div class="flex-grow flex items-center justify-center mb-4 overflow-hidden rounded-xl bg-zinc-900 border border-zinc-800">
-            <img src="assets/images/elearning_1.jpeg" class="w-full h-full object-cover opacity-50 group-hover:opacity-80 group-hover:scale-110 transition-all duration-500" alt="E-learning">
+            <img src="assets/images/SIARC.png" class="w-full h-full object-cover opacity-60 group-hover:opacity-90 group-hover:scale-110 transition-all duration-500" alt="Moteur SI-ARC">
         </div>
-        <h3 class="text-lg md:text-xl font-bold text-white">E-learning System</h3>
-        <p class="text-zinc-500 text-xs md:text-sm mt-1">Éducation connectée et interactive.</p>
+        <h3 class="text-lg font-bold text-white">Moteur SI-ARC</h3>
+        <p class="text-zinc-500 text-xs mt-1">
+            <span class="fr">Scoring de crédit & analyse du risque.</span>
+            <span class="en">Credit scoring & risk analysis.</span>
+        </p>
       </div>
 
-      <div onclick="openProject('Design & Sites Vitrines', '2024 - 2025', 'Développement frontend de sites vitrines et e-commerce. Intégration de maquettes, design minimaliste et optimisation pour la conversion et le référencement (SEO).', ['Frontend', 'UI/UX', 'SEO'], ['assets/images/Der.jpeg', 'assets/images/PGML1.jpeg'])"
-           class="bento-card rounded-3xl overflow-hidden cursor-pointer group md:col-span-2 relative p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6" data-aos="fade-up" data-aos-delay="200">
-        
-        <div class="relative z-10 w-full md:max-w-sm">
-            <div class="inline-block px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] text-emerald-400 font-bold uppercase tracking-widest mb-3 md:mb-4">Expertise Web</div>
-            <h3 class="text-xl md:text-2xl font-bold text-white mb-2">Interfaces Frontend</h3>
-            <p class="text-zinc-400 text-xs md:text-sm mb-4">Création de sites vitrines et plateformes E-commerce avec un design premium axé sur l'expérience utilisateur et la conversion.</p>
-        </div>
+    </div>
 
-        <div class="hidden sm:flex w-full md:w-64 h-40 relative rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden transform group-hover:-translate-y-2 group-hover:shadow-2xl group-hover:shadow-emerald-500/10 transition-all duration-500 z-10 flex-shrink-0">
-            <div class="p-2 border-b border-zinc-800 bg-zinc-950 flex gap-1.5 items-center">
-                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
-                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
-                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+    <div class="mt-12 md:mt-16" data-aos="fade-up">
+        <div class="flex items-center gap-4 mb-6">
+            <h3 class="text-xl font-semibold text-zinc-400">
+                <span class="fr">Autres projets</span><span class="en">Other projects</span>
+            </h3>
+            <div class="h-[1px] flex-grow bg-gradient-to-r from-zinc-800 to-transparent"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <div onclick="openProject('Supermarket MS', '<span class=\'fr\'>Décembre 2025</span><span class=\'en\'>December 2025</span>', '<span class=\'fr\'>Plateforme de gestion complète : Interface caissier (POS) temps réel et Dashboard managérial. Analyse des tendances de vente et gestion de stock automatisée.</span><span class=\'en\'>Complete management platform: Real-time POS interface and Managerial Dashboard. Sales trend analysis and automated inventory management.</span>', ['Full-Stack', 'BI', 'Pandas'], ['assets/images/supermarket_1.jpeg', 'assets/images/supermarket_2.jpeg'])"
+                 class="p-4 rounded-2xl bg-[#09090b] border border-white/5 hover:border-white/15 hover:bg-[#121214] cursor-pointer transition-all duration-300 group flex items-center gap-4 relative overflow-hidden">
+                <div class="w-16 h-16 rounded-xl bg-zinc-900 border border-zinc-800 flex-shrink-0 overflow-hidden relative z-10">
+                    <img src="assets/images/supermarket_1.jpeg" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Supermarket MS">
+                </div>
+                <div class="relative z-10">
+                    <h4 class="text-white font-semibold text-sm group-hover:text-emerald-400 transition-colors duration-300">Supermarket MS</h4>
+                    <p class="text-zinc-500 text-xs mt-1">Dashboard managérial.</p>
+                </div>
             </div>
-            <div class="p-4 flex gap-4 h-full">
-                <div class="w-1/3 bg-zinc-800/50 rounded-lg h-full"></div>
-                <div class="w-2/3 space-y-2">
-                    <div class="h-3 w-3/4 bg-zinc-800 rounded"></div>
-                    <div class="h-2 w-full bg-zinc-800/50 rounded"></div>
-                    <div class="h-2 w-5/6 bg-zinc-800/50 rounded"></div>
-                    <div class="mt-4 h-6 w-1/2 bg-emerald-500/20 rounded border border-emerald-500/30"></div>
+
+            <div onclick="openProject('Fut-Bot Predictor', '<span class=\'fr\'>Juin 2025</span><span class=\'en\'>June 2025</span>', '<span class=\'fr\'>Modèles d\'apprentissage supervisé (Random Forest, XGBoost) avec un pipeline de traitement de données pour la prédiction de résultats sportifs.</span><span class=\'en\'>Supervised learning models (Random Forest, XGBoost) with a data processing pipeline for predicting sports results.</span>', ['Machine Learning', 'XGBoost'], ['assets/images/futbot.png'])"
+                 class="p-4 rounded-2xl bg-[#09090b] border border-white/5 hover:border-white/15 hover:bg-[#121214] cursor-pointer transition-all duration-300 group flex items-center gap-4 relative overflow-hidden">
+                <div class="w-16 h-16 rounded-xl bg-zinc-900 border border-zinc-800 flex-shrink-0 overflow-hidden relative z-10">
+                    <img src="assets/images/futbot.png" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500" alt="Fut-Bot Predictor">
+                </div>
+                <div class="relative z-10">
+                    <h4 class="text-white font-semibold text-sm group-hover:text-emerald-400 transition-colors duration-300">Fut-Bot Predictor</h4>
+                    <p class="text-zinc-500 text-xs mt-1">
+                        <span class="fr">Modèles ML pour pronostics.</span><span class="en">ML models for predictions.</span>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills" class="py-20 md:py-32 px-6 md:px-12 lg:px-24 border-t border-white/5 relative z-10 bg-[#020202]">
+  <div class="max-w-7xl mx-auto">
+    
+    <div class="mb-24" data-aos="fade-up">
+      <div class="mb-10 text-center md:text-left">
+          <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+              <span class="fr">Expertise Technique</span><span class="en">Technical Expertise</span>
+          </h2>
+          <p class="text-zinc-400 mt-4 max-w-2xl">
+              <span class="fr">Une maîtrise des outils modernes pour transformer la donnée brute en solutions tangibles.</span>
+              <span class="en">Mastery of modern tools to transform raw data into tangible solutions.</span>
+          </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="relative group rounded-3xl p-[1px] bg-gradient-to-b from-zinc-800/60 to-transparent overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="relative h-full bg-[#09090b] rounded-[23px] p-6 md:p-8 flex flex-col">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-6 border border-emerald-500/20 group-hover:scale-110 transition-transform duration-500">
+                    <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-6">Data Science & ML</h3>
+                <div class="flex flex-wrap gap-2 mt-auto">
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">Python</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">Pandas / NumPy</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">Scikit-Learn</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">Random Forest</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">XGBoost</span>
                 </div>
             </div>
         </div>
+
+        <div class="relative group rounded-3xl p-[1px] bg-gradient-to-b from-zinc-800/60 to-transparent overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="relative h-full bg-[#09090b] rounded-[23px] p-6 md:p-8 flex flex-col">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-6 border border-purple-500/20 group-hover:scale-110 transition-transform duration-500">
+                    <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-6">
+                    <span class="fr">Visualisation</span><span class="en">Data Viz & Analysis</span>
+                </h3>
+                <div class="flex flex-wrap gap-2 mt-auto">
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">Power BI</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">Tableau</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">Seaborn</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">R / Stata</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">Excel</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="relative group rounded-3xl p-[1px] bg-gradient-to-b from-zinc-800/60 to-transparent overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="relative h-full bg-[#09090b] rounded-[23px] p-6 md:p-8 flex flex-col">
+                <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-6 border border-blue-500/20 group-hover:scale-110 transition-transform duration-500">
+                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-6">
+                    <span class="fr">Web & Bases de données</span><span class="en">Web & Databases</span>
+                </h3>
+                <div class="flex flex-wrap gap-2 mt-auto">
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">Django</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">JavaScript</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">Tailwind CSS</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">PostgreSQL</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">MongoDB</span>
+                    <span class="px-3 py-1.5 bg-zinc-900 rounded-lg text-xs font-medium border border-zinc-800 text-zinc-300">Linux</span>
+                </div>
+            </div>
+        </div>
+
       </div>
-
     </div>
-  </div>
-</section>
 
-<section id="skills" class="py-20 md:py-24 px-6 md:px-12 lg:px-24 border-t border-white/5 relative z-10 bg-black">
-  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16">
-    
     <div data-aos="fade-up">
-      <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-white tracking-tight">Expertise Technique</h2>
-      <div class="space-y-4 md:space-y-6">
-        <div class="p-5 md:p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/50 hover:bg-zinc-900 transition-colors">
-            <h3 class="text-base md:text-lg font-semibold text-white mb-3 md:mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-                Data Science & IA
-            </h3>
-            <div class="flex flex-wrap gap-2">
-                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">Python</span>
-                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">Pandas / NumPy</span>
-                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">Scikit-Learn</span>
-                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">Power BI</span>
-            </div>
-        </div>
-        <div class="p-5 md:p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/50 hover:bg-zinc-900 transition-colors">
-            <h3 class="text-base md:text-lg font-semibold text-white mb-3 md:mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                Développement Web
-            </h3>
-            <div class="flex flex-wrap gap-2">
-                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">Django</span>
-                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">JavaScript</span>
-                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">Tailwind CSS</span>
-                <span class="px-3 py-1.5 bg-black rounded-lg text-xs md:text-sm border border-zinc-800 text-zinc-300">PostgreSQL</span>
-            </div>
-        </div>
+      <div class="mb-14 text-center">
+          <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+              <span class="fr">Mon Parcours</span><span class="en">My Journey</span>
+          </h2>
       </div>
-    </div>
 
-    <div data-aos="fade-up" data-aos-delay="100">
-      <h2 class="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-white tracking-tight">Parcours</h2>
-      <div class="relative border-l border-zinc-800 ml-3 space-y-8 md:space-y-10 py-2">
-        <div class="relative pl-6 md:pl-8">
-          <span class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-white ring-8 ring-black"></span>
-          <h3 class="text-lg md:text-xl font-bold text-white">Licence Informatique & Data</h3>
-          <p class="text-zinc-500 text-xs md:text-sm font-medium mt-1">2024 – Présent | BEM TECH Dakar</p>
-          <p class="mt-2 md:mt-3 text-zinc-400 text-xs md:text-sm leading-relaxed">Spécialisation en Big Data, Algorithmique avancée et IA. Création de pipelines ETL et modèles prédictifs.</p>
+      <div class="relative max-w-4xl mx-auto py-10">
+        <div class="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-zinc-800 via-zinc-700 to-transparent md:-translate-x-1/2"></div>
+        <div class="absolute left-6 md:left-1/2 top-0 h-1/3 w-px bg-gradient-to-b from-emerald-500 to-transparent md:-translate-x-1/2 shadow-[0_0_15px_rgba(16,185,129,0.8)] z-0"></div>
+
+        <div class="relative flex flex-col md:flex-row items-center justify-between mb-16 md:mb-24 group">
+            <div class="md:w-[45%] text-left md:text-right w-full pl-16 md:pl-0 pr-0 md:pr-10">
+                <span class="text-emerald-400 font-mono text-sm tracking-widest block mb-2">
+                    <span class="fr">2023 – Présent</span><span class="en">2023 – Present</span>
+                </span>
+                <h3 class="text-xl md:text-2xl font-bold text-white">
+                    <span class="fr">L3 Informatique & Data</span><span class="en">BSc Computer Science & Data</span>
+                </h3>
+                <p class="text-zinc-500 mt-1 text-sm">BEM TECH Dakar</p>
+            </div>
+            
+            <div class="absolute left-6 md:left-1/2 w-4 h-4 rounded-full bg-black border-2 border-emerald-500 md:-translate-x-1/2 -translate-x-[7px] group-hover:bg-emerald-500 group-hover:shadow-[0_0_20px_rgba(16,185,129,1)] transition-all duration-300 z-10"></div>
+            
+            <div class="md:w-[45%] w-full pl-16 md:pl-10 mt-4 md:mt-0 text-left">
+                <div class="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/50 group-hover:border-zinc-600 transition-colors backdrop-blur-sm">
+                    <p class="text-zinc-400 text-sm leading-relaxed">
+                        <span class="fr">Spécialisation en Data Science, Algorithmique avancée et IA. Création de pipelines ETL, développement de modèles prédictifs et architecture full-stack.</span>
+                        <span class="en">Specialization in Data Science, advanced algorithms, and AI. Creation of ETL pipelines, predictive models, and full-stack architecture.</span>
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="relative pl-6 md:pl-8">
-          <span class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-zinc-700 ring-8 ring-black"></span>
-          <h3 class="text-lg md:text-xl font-bold text-white">Baccalauréat Scientifique</h3>
-          <p class="text-zinc-500 text-xs md:text-sm font-medium mt-1">2023 | Lycée Dom Helder Camara</p>
-          <p class="mt-2 md:mt-3 text-zinc-400 text-xs md:text-sm leading-relaxed">Série D, Mention Bien. Solides bases en mathématiques structurant une approche analytique.</p>
+
+        <div class="relative flex flex-col md:flex-row items-center justify-between group">
+            <div class="md:w-[45%] text-left w-full pl-16 md:pl-10 mt-4 md:mt-0 md:order-2">
+                <span class="text-zinc-500 font-mono text-sm tracking-widest block mb-2">2023</span>
+                <h3 class="text-xl md:text-2xl font-bold text-white">
+                    <span class="fr">Baccalauréat Scientifique</span><span class="en">High School Diploma (Science)</span>
+                </h3>
+                <p class="text-zinc-500 mt-1 text-sm">Lycée Dom Helder Camara</p>
+            </div>
+            
+            <div class="absolute left-6 md:left-1/2 w-4 h-4 rounded-full bg-black border-2 border-zinc-600 md:-translate-x-1/2 -translate-x-[7px] group-hover:bg-white group-hover:border-white group-hover:shadow-[0_0_20px_rgba(255,255,255,0.8)] transition-all duration-300 z-10"></div>
+            
+            <div class="md:w-[45%] w-full pl-16 md:pl-0 pr-0 md:pr-10 text-left md:text-right md:order-1 mt-4 md:mt-0">
+                <div class="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800/50 group-hover:border-zinc-600 transition-colors backdrop-blur-sm text-left">
+                    <p class="text-zinc-400 text-sm leading-relaxed">
+                        <span class="fr">Obtention du baccalauréat Série D. Solides fondations en mathématiques et logique analytique.</span>
+                        <span class="en">Graduated with focus on Sciences. Solid foundations in mathematics and analytical logic.</span>
+                    </p>
+                </div>
+            </div>
         </div>
+
       </div>
     </div>
 
   </div>
 </section>
 
-<footer class="py-10 md:py-12 border-t border-white/5 text-center relative z-10 bg-black">
-  <div class="flex justify-center gap-6 md:gap-8 mb-4 md:mb-6">
-    <a href="https://www.linkedin.com/in/rudy-jean-felix-tchicaya-a7aa3a2a1/" target="_blank" class="text-zinc-500 hover:text-white transition-colors text-xs md:text-sm font-medium">LinkedIn</a>
-    <a href="mailto:tchicayarudy071@gmail.com" class="text-zinc-500 hover:text-white transition-colors text-xs md:text-sm font-medium">Email</a>
+<section id="contact" class="py-24 md:py-32 px-6 md:px-12 lg:px-24 border-t border-white/5 relative z-10 bg-black overflow-hidden">
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-emerald-500/5 rounded-full blur-[120px]"></div>
   </div>
-  <p class="text-zinc-600 text-xs md:text-sm">© 2026 — Jean-Félix Tchicaya Rudy.</p>
+
+  <div class="max-w-4xl mx-auto relative z-10">
+    <div class="text-center mb-14 md:mb-20" data-aos="fade-up">
+      <p class="text-[10px] uppercase tracking-widest text-zinc-500 font-semibold mb-5 inline-flex items-center gap-2">
+        <span class="w-4 h-px bg-zinc-700 inline-block"></span>
+        Contact
+        <span class="w-4 h-px bg-zinc-700 inline-block"></span>
+      </p>
+      <h2 class="text-4xl sm:text-5xl md:text-7xl font-bold text-white tracking-tighter leading-[0.9] mb-5">
+        <span class="fr">Travaillons<br><span class="shimmer">ensemble.</span></span>
+        <span class="en">Let's work<br><span class="shimmer">together.</span></span>
+      </h2>
+      <p class="text-zinc-400 text-base md:text-lg max-w-md mx-auto font-light leading-relaxed mt-6">
+        <span class="fr">Disponible pour un stage, une collaboration ou un projet freelance. Répondez-moi, je réponds vite.</span>
+        <span class="en">Available for an internship, a collaboration, or a freelance project. Reach out, I reply fast.</span>
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+
+      <a href="mailto:tchicayarudy071@gmail.com" onclick="copyEmail(event)"
+         class="contact-card group relative p-6 md:p-7 rounded-2xl bg-zinc-900/40 border border-zinc-800/60 hover:border-emerald-500/50 overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_20px_60px_rgba(0,0,0,0.6)] cursor-pointer block z-20">
+        
+        <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" style="background: radial-gradient(ellipse at 50% 120%, rgba(16,185,129,0.06) 0%, transparent 70%)"></div>
+        <div class="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+
+        <div class="relative z-10 pointer-events-none">
+          <div class="w-11 h-11 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-5 group-hover:bg-emerald-500 group-hover:border-emerald-400 group-hover:scale-110 transition-all duration-300 shadow-md">
+            <svg class="w-5 h-5 text-zinc-400 group-hover:text-black transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <p class="text-[10px] uppercase tracking-widest text-zinc-600 font-semibold mb-1.5">Email</p>
+          <p class="text-white font-semibold text-sm group-hover:text-emerald-400 transition-colors duration-300 break-all leading-snug">tchicayarudy071@gmail.com</p>
+          
+          <div class="flex items-center gap-1.5 mt-4 text-zinc-600 text-xs transition-all duration-300">
+            <span id="emailTextFr" class="fr group-hover:text-zinc-400">M'envoyer un mail</span>
+            <span id="emailTextEn" class="en group-hover:text-zinc-400">Send an email</span>
+            
+            <svg id="emailIcon" class="w-3 h-3 group-hover:translate-x-1 group-hover:text-zinc-400 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            
+            <span id="copyConfirm" class="hidden text-emerald-400 font-semibold ml-2">Copié !</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://www.linkedin.com/in/rudy-jean-felix-tchicaya-a7aa3a2a1/" target="_blank" rel="noopener noreferrer"
+         class="contact-card group relative p-6 md:p-7 rounded-2xl bg-zinc-900/40 border border-zinc-800/60 hover:border-blue-500/40 overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_20px_60px_rgba(0,0,0,0.6)] cursor-pointer block z-20">
+        
+        <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" style="background: radial-gradient(ellipse at 50% 120%, rgba(59,130,246,0.06) 0%, transparent 70%)"></div>
+        <div class="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-blue-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+
+        <div class="relative z-10 pointer-events-none">
+          <div class="w-11 h-11 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-5 group-hover:bg-[#0077B5] group-hover:border-[#0077B5] group-hover:scale-110 transition-all duration-300 shadow-md">
+            <svg class="w-5 h-5 text-zinc-400 group-hover:text-white transition-colors duration-300" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+            </svg>
+          </div>
+          <p class="text-[10px] uppercase tracking-widest text-zinc-600 font-semibold mb-1.5">LinkedIn</p>
+          <p class="text-white font-semibold text-sm group-hover:text-blue-400 transition-colors duration-300 leading-snug">Rudy Jean-Félix Tchicaya</p>
+          <div class="flex items-center gap-1.5 mt-4 text-zinc-600 text-xs group-hover:text-zinc-400 transition-all duration-300">
+            <span class="fr">Voir le profil</span><span class="en">View profile</span>
+            <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<button id="backToTop" class="fixed bottom-8 right-8 w-12 h-12 bg-zinc-900 border border-zinc-700 text-zinc-400 rounded-full flex items-center justify-center opacity-0 translate-y-10 pointer-events-none transition-all duration-500 z-50 hover:bg-emerald-500 hover:text-black hover:border-emerald-500 hover:scale-110 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"></path></svg>
+</button>
+
+<footer class="py-8 border-t border-white/5 text-center relative z-10 bg-black">
+  <p class="text-zinc-700 text-xs">© 2026 — Jean-Félix Tchicaya Rudy.</p>
 </footer>
 
 <div id="drawerOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] opacity-0 pointer-events-none transition-opacity duration-500" onclick="closeDrawer()"></div>
@@ -340,33 +558,61 @@
 
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
+    if (history.scrollRestoration) history.scrollRestoration = 'manual';
+
     AOS.init({ duration: 800, once: true, offset: 50 });
 
-    // --- CURSEUR & MASQUE INTERACTIF ---
+    /* BOUTON RETOUR EN HAUT - LOGIQUE */
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) {
+            backToTop.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
+        } else {
+            backToTop.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
+        }
+    });
+
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    /* LOGIQUE DE TRADUCTION FR/EN */
+    function toggleLanguage() {
+        document.body.classList.toggle('lang-en');
+        const isEng = document.body.classList.contains('lang-en');
+        localStorage.setItem('portfolio_lang', isEng ? 'en' : 'fr');
+    }
+
+    // Charger la langue au démarrage
+    if(localStorage.getItem('portfolio_lang') === 'en') {
+        document.body.classList.add('lang-en');
+    }
+
     if (window.matchMedia("(pointer: fine)").matches) {
         let xTo = gsap.quickTo("#cursor", "x", {duration: 0.1, ease: "power3"});
         let yTo = gsap.quickTo("#cursor", "y", {duration: 0.1, ease: "power3"});
+        
+        let glowX = gsap.quickTo("#glow", "x", {duration: 0.1, ease: "power3"});
+        let glowY = gsap.quickTo("#glow", "y", {duration: 0.1, ease: "power3"});
+        
         const cursorEl = document.getElementById('cursor');
-        const gridMask = document.getElementById('grid-mask');
 
         window.addEventListener('mousemove', e => {
             xTo(e.clientX);
             yTo(e.clientY);
             
-            if(gridMask) {
-                gridMask.style.setProperty('--x', e.clientX + 'px');
-                gridMask.style.setProperty('--y', e.clientY + 'px');
-            }
+            glowX(e.clientX);
+            glowY(e.clientY);
         });
 
-        document.querySelectorAll('a, button, .bento-card').forEach(el => {
+        document.querySelectorAll('a, button, .bento-card, .cursor-pointer, .contact-card').forEach(el => {
             el.addEventListener('mouseenter', () => cursorEl.style.transform = 'translate(-50%, -50%) scale(2.5)');
             el.addEventListener('mouseleave', () => cursorEl.style.transform = 'translate(-50%, -50%) scale(1)');
         });
     }
 
-    // --- GSAP TEXT REVEAL ---
     window.addEventListener('load', () => {
+        window.scrollTo({ top: 0, behavior: 'instant' });
         const tl = gsap.timeline();
         tl.from(".hero-tag", { y: 20, opacity: 0, duration: 0.8, ease: "power4.out" })
           .from(".hero-line", { y: 100, duration: 1.2, ease: "power4.out", stagger: 0.1 }, "-=0.6")
@@ -374,11 +620,11 @@
           .from(".hero-btn", { y: 20, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power3.out" }, "-=0.8");
     });
 
-    // --- DRAWER LOGIC ---
     function openProject(title, date, desc, tags, images) {
-        document.getElementById('drawerTitle').innerText = title;
-        document.getElementById('drawerDate').innerText = date;
-        document.getElementById('drawerDesc').innerText = desc;
+        // Remplacement de innerText par innerHTML pour autoriser les balises de traduction dans le Drawer
+        document.getElementById('drawerTitle').innerHTML = title;
+        document.getElementById('drawerDate').innerHTML = date;
+        document.getElementById('drawerDesc').innerHTML = desc;
         
         const tagContainer = document.getElementById('drawerTags');
         tagContainer.innerHTML = '';
@@ -406,6 +652,38 @@
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeDrawer();
     });
+
+
+    /* LOGIQUE DE COPIE EMAIL */
+    function copyEmail(e) {
+        // On n'empêche pas le lien de s'ouvrir s'il marche (on ne met pas preventDefault)
+        // Mais on copie quand même l'adresse au cas où.
+        const email = "tchicayarudy071@gmail.com";
+        navigator.clipboard.writeText(email).then(() => {
+            // Afficher le retour visuel
+            const textFr = document.getElementById('emailTextFr');
+            const textEn = document.getElementById('emailTextEn');
+            const icon = document.getElementById('emailIcon');
+            const confirm = document.getElementById('copyConfirm');
+            
+            // Masquer les textes normaux
+            textFr.style.display = 'none';
+            textEn.style.display = 'none';
+            icon.style.display = 'none';
+            
+            // Afficher "Copié !" dans la bonne langue
+            confirm.style.display = 'inline-block';
+            confirm.innerText = document.body.classList.contains('lang-en') ? 'Copied!' : 'Copié !';
+            
+            // Remettre à la normale après 3 secondes
+            setTimeout(() => {
+                textFr.style.display = '';
+                textEn.style.display = '';
+                icon.style.display = '';
+                confirm.style.display = 'none';
+            }, 3000);
+        });
+    }
 </script>
 
 </body>
